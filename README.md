@@ -157,8 +157,7 @@ the app using Azure Data Migration Assistant (DMA) to Azure SQL.
     show all dinners.
 
 15.  You can scale down the App Service plan to save on costs as the default Plan
-    is P1V2 so you can scale down to B1 or D1 if you plan to run for less than
-    240 mins per day.
+    is P1V2 so you can scale down to B1.
 
 
 
