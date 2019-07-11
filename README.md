@@ -289,15 +289,15 @@ Service.
     values similar to below. Edit the name of the database to the FQDN from the
     Azure Portal:
 
-Server=tcp:{Portal FQDN},1433;Initial Catalog=aspnet-NerdDinner;Persist Security
+`Server=tcp:{Portal FQDN},1433;Initial Catalog=aspnet-NerdDinner;Persist Security
 Info=False;User
 ID=**{your_username}**;Password=**{your_password}**;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection
-Timeout=30;
+Timeout=30;`
 
-Server=tcp:{Portal FQDN},1433;Initial Catalog=NerdDinnerContext;Persist Security
+`Server=tcp:{Portal FQDN},1433;Initial Catalog=NerdDinnerContext;Persist Security
 Info=False;User
 ID=**{your_username}**;Password=**{your_password}**;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection
-Timeout=30;
+Timeout=30;`
 
 15.  In the Portal add the “Default Connection” Connection String to the App
     Service Configurations Application Settings:
