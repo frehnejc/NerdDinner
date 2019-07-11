@@ -159,6 +159,164 @@ the app using Azure Data Migration Assistant (DMA) to Azure SQL.
 15.  You can scale down the App Service plan to save on costs as the default Plan
     is P1V2 so you can scale down to B1.
 
+Part 2 – Use Data Migration Assistant (DMA) to Migrate the On-Prem Database to Azure SQL PaaS
+---------------------------------------------------------------------------------------------
+
+### Overview
+
+>   This is Part 2 of the two-part series, Part 1 deals with migrating the
+>   Application to Azure App Services and setting up the source environment. If
+>   you haven't already setup your environment.
+
+>   The App uses two databases, one for storing the registered users and another
+>   to store the dinner events. The DMA uses six steps:
+
+1.  Select the Source.
+
+2.  Select the Target.
+
+3.  Select the Objects.
+
+4.  Script and Deploy the Schema.
+
+5.  Select the Tables.
+
+6.  Migrate Data.
+
+We will then move out the Connection Strings from the web.config to the App
+Service.
+
+### Prerequisites
+
+1.  Download and install the Data Migration Assistant from
+    [here](https://www.microsoft.com/en-us/download/details.aspx?id=53595).
+
+2.  Obtain credentials to access the SQL server where the database resides, you
+    will need this to migrate the databases.
+
+3.  Create a New Azure SQL Server, remembering to add your Client IP address to
+    the firewall and Virtual Networks rule. This SQL Server will host the two
+    new databases, take note of the credentials to connect to the SQL Server,
+    you will need these later.
+
+4.  Create two new blank databases attached the new SQL Server. Create an
+    “aspnet-NerdDinner” and “NerdDinnerContext” database. You could even give
+    [SQL
+    Serverless](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-serverless)
+    a try.
+
+### Before DMA
+
+![](media/a77aa23254dfa3fc6b4efae9825245cb.png)
+
+### After DMA
+
+![](media/9026769b5b917779823fdde15f8e1427.png)
+
+### Detailed Steps
+
+1.  In a real-world example, you would stop your App to ensure that there is no
+    activity on the source database. You would undertake the data migration
+    reconfigure the Connection Strings and restart the App.
+
+2.  Launch the DMA and create a New Migration Project.
+
+3.  We will migrate each database starting with the “aspnet-NerdDinner”, so name
+    the project as such, the results will be similar to below:
+
+![](media/645a0f56b3134d6002c3f52a325c233f.png)
+
+4.  Select Create and enter the Server name of your source SQL Server and the
+    appropriate Authentication type, in my case I chose SQL Server
+    Authentication, the result should be similar to below, if you haven’t setup
+    Encryption on the source database untick this option and select connect, the
+    results display as shown in the following graphic:
+
+![](media/5d25bb212ad21456bb1be1220197c548.png)
+
+5.  You will be presented with the Source databases, since we are starting with
+    the “asp-NerdDinner” database select this and click Next.
+
+6.  Now select the Destination Azure SQL Server, select the Authentication type
+    as SQL Server Authentication (if appropriate) and enter the credentials for
+    your destination SQL Server, the result should be similar to below (noting
+    the Encrypt connection option is selected). Select Next, the results display
+    as shown in the following graphic:
+
+![](media/0a0fc73f92fc0ff9c40bdca573679a82.png)
+
+7.  Select the Target Database that has been created earlier in the
+    prerequisites section as “aspnet-NerdDinner” and click Next.
+
+8.  You will now be presented with the Schema Objects, by default all will be
+    selected, click Generate SQL Script, as shown below:
+
+![](media/a5c5b79bcf8645ea1c85e8a91c800c01.png)
+
+9.  You will be presented with the SQL Script for the Schema, you have an option
+    to save this for later. Click Deploy schema to migrate it to Azure SQL, the
+    results are shown below:
+
+![](media/4d2d2d119038c9f0d9eba65939e03845.png)
+
+10.  To Migrate the data, select the Migrate Data button, you will be shown a
+    list of tables like below, click the Start Data Migration to migrate the
+    data:
+
+![](media/24096803a33192c3ece1d6f073f3eb5b.png)
+
+10.  After the migration completes you are presented with the status of the
+    migration:
+
+![](media/33d2aac3bdffb951fcd3b9dd012e8c2c.png)
+
+12.  To migrate the “NerdDinnerContext“ database repeat steps 7 to 11, the final
+    database migration will display the following:
+
+![](media/9f6f09f39d3076b13e2994f9a2202ea7.png)
+
+13.  Now we will go and move the connection strings from the local web.config on
+    the App Service to the Application Settings Connection Strings. Cut out the
+    two connection strings from the App Service using “Advanced Tools” and save
+    them in case you need to back out, below is what is being removed, save this
+    file.
+
+![](media/3a4106ef1767e1b2c78e926eb93c42d5.png)
+
+14.  Copy the Connection Strings from each of the databases in the azure Portal
+    into a temporary Notepad for editing, add your username and password you
+    saved earlier from when you created the database. Your notepad will have
+    values similar to below. Edit the name of the database to the FQDN from the
+    Azure Portal:
+
+Server=tcp:{Portal FQDN},1433;Initial Catalog=aspnet-NerdDinner;Persist Security
+Info=False;User
+ID=**{your_username}**;Password=**{your_password}**;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection
+Timeout=30;
+
+Server=tcp:{Portal FQDN},1433;Initial Catalog=NerdDinnerContext;Persist Security
+Info=False;User
+ID=**{your_username}**;Password=**{your_password}**;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection
+Timeout=30;
+
+15.  In the Portal add the “Default Connection” Connection String to the App
+    Service Configurations Application Settings:
+
+![](media/5406a188e4ed8dc27b6af15d2549057f.png)
+
+16.  Now add the In the Portal add the “NerdDinnerContext” Connection String to
+    the App Service Configurations Application Settings:
+
+![](media/6d46372022f73d87d8ee63de2e633962.png)
+
+17.  You will have the two connection strings as shown, click save:
+
+![](media/40a63a6c3958ec62f1053efb647cce9f.png)
+
+18.  Your App will be now be using the migrated database, to validate browse to
+    it using the URL provided in the portal, and click “View all Upcoming
+    Dinners”. If your database migration is successful you will have your
+    upcoming dinners displayed.
 
 
 References
