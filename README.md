@@ -317,6 +317,9 @@ Timeout=30;`
     it using the URL provided in the portal, and click “View all Upcoming
     Dinners”. If your database migration is successful you will have your
     upcoming dinners displayed.
+    
+19.  **Update:** For a zero downtime migration of your database stay tuned for my step by step article on using the Azure Database
+    Migration Service (DMS).
 
 
 References
